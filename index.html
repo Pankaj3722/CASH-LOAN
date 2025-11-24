@@ -3,53 +3,123 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>LOAN PAY</title>
+  <title>LOAN PAY — Apply fast</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
   <link rel="stylesheet" href="styles.css" />
+  <meta name="theme-color" content="#0b5eff" />
 </head>
-<body>
-  <header class="TopBar">
-    <h1>LOAN PAY</h1>
-    <small>Simple loan application — Apply in 1 minute</small>
+<body class="page">
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img src="icons/icon-192.png" alt="Loan Pay" class="brand-icon"/>
+        <div>
+          <h1 class="brand-title">LOAN PAY</h1>
+          <div class="brand-sub">Fast • Simple • Safe</div>
+        </div>
+      </div>
+
+      <nav class="top-actions">
+        <button id="installBtn" class="btn ghost" hidden>Install</button>
+      </nav>
+    </div>
   </header>
 
   <main class="container">
-    <section id="signupSection" class="card">
-      <h2>Signup (Email)</h2>
-      <input id="emailInput" placeholder="Email (example@gmail.com)" />
-      <button id="signupBtn">Signup / Continue</button>
+    <section class="hero card">
+      <h2>Apply for loan in 60 seconds</h2>
+      <p class="muted">Small loans, simple process. EMI estimate shown instantly — no signup required (email optional).</p>
+      <div class="hero-grid">
+        <div>
+          <label class="label">Loan amount (₹)</label>
+          <input id="heroAmount" type="number" placeholder="10000" value="10000" />
+        </div>
+        <div>
+          <label class="label">Tenure (months)</label>
+          <input id="heroTenure" type="number" placeholder="12" value="12" />
+        </div>
+        <div>
+          <label class="label">Interest % (annual)</label>
+          <input id="heroInterest" type="number" placeholder="12" value="12" />
+        </div>
+        <div class="hero-actions">
+          <button id="heroCalc" class="btn primary">Estimate EMI</button>
+        </div>
+      </div>
+      <div id="heroResult" class="result"></div>
+    </section>
+
+    <section id="signupSection" class="card compact">
+      <h3>Signup (email optional)</h3>
+      <div class="row">
+        <input id="emailInput" placeholder="Email (example@gmail.com)" />
+        <button id="signupBtn" class="btn">Continue</button>
+      </div>
+      <div class="muted small">Your email is only used to contact you about the application.</div>
     </section>
 
     <section id="applySection" class="card hidden">
-      <h2>Apply for Loan</h2>
-      <label>Full name</label>
-      <input id="name" placeholder="Your name" />
-      <label>Phone</label>
-      <input id="phone" placeholder="91XXXXXXXXXX" />
-      <label>Amount (₹)</label>
-      <input id="amount" type="number" placeholder="10000" />
-      <label>Tenure (months)</label>
-      <input id="tenure" type="number" placeholder="6" />
-      <label>Interest % (annual)</label>
-      <input id="interest" type="number" placeholder="12" />
-      <label>Purpose</label>
-      <input id="purpose" placeholder="Purpose of loan" />
-      <button id="applyBtn">Submit Application</button>
-      <div id="status"></div>
+      <h3>Apply for Loan</h3>
+      <div class="form-grid">
+        <div><label class="label">Full name</label><input id="name" placeholder="Your name" /></div>
+        <div><label class="label">Phone</label><input id="phone" placeholder="91XXXXXXXXXX" /></div>
+        <div><label class="label">Amount (₹)</label><input id="amount" type="number" placeholder="10000" /></div>
+        <div><label class="label">Tenure (months)</label><input id="tenure" type="number" placeholder="6" /></div>
+        <div><label class="label">Interest % (annual)</label><input id="interest" type="number" placeholder="12" /></div>
+        <div><label class="label">Purpose</label><input id="purpose" placeholder="Purpose of loan" /></div>
+      </div>
+
+      <div class="apply-actions">
+        <button id="applyBtn" class="btn primary">Submit Application</button>
+        <button id="clearLocal" class="btn ghost">Clear Local Data</button>
+      </div>
+
+      <div id="status" class="status muted"></div>
     </section>
 
-    <section class="card info">
-      <h3>Privacy</h3>
-      <p>We collect only name, email, phone and documents for processing. Data stored locally and optionally synced.</p>
+    <section class="card small muted">
+      <strong>Privacy:</strong> We store only name, email, phone and loan details locally. You can export data from admin view.
     </section>
 
-    <footer class="card small">
-      <p>Contact: <span id="contactEmail">contact@example.com</span></p>
-      <p>Install: browser menu → Add to Home screen</p>
+    <footer class="footer">
+      <div>Contact: <a id="contactEmail" href="mailto:contact@example.com">contact@example.com</a></div>
+      <div class="footer-right">Install: browser menu → Add to Home screen</div>
     </footer>
   </main>
 
   <script src="app.js"></script>
+  <script>
+    // small UI helpers (non-breaking; safe if app.js already does similar)
+    (function(){
+      // Install button handling (PWA)
+      let deferredPrompt;
+      const installBtn = document.getElementById('installBtn');
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.hidden = false;
+      });
+      installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        installBtn.hidden = true;
+      });
+
+      // Hero EMI quick calc
+      const q = (s)=>document.querySelector(s);
+      document.getElementById('heroCalc').onclick = ()=>{
+        const A = Number(q('#heroAmount').value)||0;
+        const n = Number(q('#heroTenure').value)||1;
+        const r = (Number(q('#heroInterest').value)||0)/100/12;
+        if (A<=0){ q('#heroResult').innerText='Enter a valid amount'; return; }
+        const m = (A*r)/(1-Math.pow(1+r,-n));
+        q('#heroResult').innerHTML = `<strong>Estimated monthly:</strong> ₹ ${m.toFixed(2)} • Total ₹ ${(m*n).toFixed(2)}`;
+      };
+    })();
+  </script>
 </body>
 </html>
