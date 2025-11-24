@@ -1,10 +1,60 @@
-:root{font-family:Inter,system-ui,Arial;background:#f5f7fb;color:#0b1b3a}
+:root{
+  --bg:#f4f7fb;
+  --card:#ffffff;
+  --accent:#0b5eff;
+  --muted:#6b7280;
+  --radius:14px;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color-scheme: light;
+}
+
 *{box-sizing:border-box}
-.TopBar{background:#0b5eff;color:white;padding:16px;text-align:center}
-.container{max-width:700px;margin:18px auto;padding:12px}
-.card{background:white;border-radius:8px;padding:12px;margin-bottom:12px;box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+body.page{background:linear-gradient(180deg,#f7f9ff 0%, var(--bg) 100%); margin:0; min-height:100vh}
+.container{max-width:920px;margin:18px auto;padding:18px}
+
+/* Topbar */
+.topbar{backdrop-filter: blur(6px); position:sticky; top:0; z-index:20; border-bottom:1px solid rgba(11,94,255,0.06);}
+.topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;max-width:1200px;margin:0 auto}
+.brand{display:flex;gap:12px;align-items:center}
+.brand-icon{width:48px;height:48px;border-radius:12px;object-fit:cover;box-shadow:0 6px 18px rgba(11,94,255,0.12)}
+.brand-title{margin:0;font-size:18px;letter-spacing:0.6px}
+.brand-sub{font-size:12px;color:var(--muted)}
+
+/* Cards */
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:0 6px 20px rgba(14,30,37,0.04)}
+.card.compact{padding:12px}
+.small{font-size:13px}
+
+/* Hero */
+.hero h2{margin:0 0 6px 0;font-size:20px}
+.muted{color:var(--muted);font-size:14px}
+.hero-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.hero-grid input, .form-grid input, #emailInput{width:100%;padding:10px;border-radius:10px;border:1px solid #e6eefc;background:linear-gradient(180deg,#fff,#fbfdff)}
+.label{font-size:13px;color:#374151;margin-bottom:6px;display:block}
+
+/* buttons */
+.btn{display:inline-block;padding:10px 14px;border-radius:10px;border:none;background:#f1f5f9;color:#0b2340;cursor:pointer;font-weight:600}
+.btn.primary{background:var(--accent);color:#fff;box-shadow:0 8px 24px rgba(11,94,255,0.18)}
+.btn.ghost{background:transparent;border:1px solid rgba(13,79,255,0.08);color:var(--accent)}
+
+/* responsiveness for hero */
+@media (max-width:720px){
+  .hero-grid{grid-template-columns:1fr;align-items:center}
+  .brand-title{font-size:16px}
+}
+
+/* Form layout */
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (max-width:720px){ .form-grid{grid-template-columns:1fr} }
+
+/* apply actions */
+.apply-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.result{margin-top:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#f8fbff,#ffffff);font-weight:600}
+.status{margin-top:10px}
+
+/* footer */
+.footer{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted);padding:6px 2px}
+.footer a{color:var(--accent);text-decoration:none}
+
+/* hidden helper */
 .hidden{display:none}
-input{width:100%;padding:10px;margin:8px 0;border:1px solid #ddd;border-radius:6px}
-button{background:#0b5eff;color:white;border:none;padding:10px 12px;border-radius:6px;cursor:pointer}
-.small{font-size:13px;color:#444}
-.info p{margin:0}
