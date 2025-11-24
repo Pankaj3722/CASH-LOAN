@@ -4,9 +4,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>LOAN PAY — Apply fast</title>
+
+  <!-- MAIN ICON (YOUR PNG) -->
+  <link rel="icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png" />
+  <link rel="apple-touch-icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png" />
+
+  <!-- MANIFEST -->
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
+
+  <!-- CSS -->
   <link rel="stylesheet" href="styles.css" />
+
   <meta name="theme-color" content="#0b5eff" />
 </head>
 <body class="page">
@@ -14,7 +22,7 @@
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <img src="icons/icon-192.png" alt="Loan Pay" class="brand-icon"/>
+        <img src="icons/file_0000000043a872078e5b55921c7e8ad.png" alt="Loan Pay" class="brand-icon"/>
         <div>
           <h1 class="brand-title">LOAN PAY</h1>
           <div class="brand-sub">Fast • Simple • Safe</div>
@@ -90,36 +98,37 @@
   </main>
 
   <script src="app.js"></script>
-  <script>
-    // small UI helpers (non-breaking; safe if app.js already does similar)
-    (function(){
-      // Install button handling (PWA)
-      let deferredPrompt;
-      const installBtn = document.getElementById('installBtn');
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        installBtn.hidden = false;
-      });
-      installBtn.addEventListener('click', async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const choice = await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        installBtn.hidden = true;
-      });
 
-      // Hero EMI quick calc
-      const q = (s)=>document.querySelector(s);
-      document.getElementById('heroCalc').onclick = ()=>{
-        const A = Number(q('#heroAmount').value)||0;
-        const n = Number(q('#heroTenure').value)||1;
-        const r = (Number(q('#heroInterest').value)||0)/100/12;
-        if (A<=0){ q('#heroResult').innerText='Enter a valid amount'; return; }
-        const m = (A*r)/(1-Math.pow(1+r,-n));
-        q('#heroResult').innerHTML = `<strong>Estimated monthly:</strong> ₹ ${m.toFixed(2)} • Total ₹ ${(m*n).toFixed(2)}`;
-      };
-    })();
+  <script>
+    // PWA INSTALL BUTTON
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.hidden = false;
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.hidden = true;
+    });
+
+    // HERO EMI CALC
+    const $ = (s)=>document.querySelector(s);
+    $('#heroCalc').onclick = ()=>{
+      const A = Number($('#heroAmount').value)||0;
+      const n = Number($('#heroTenure').value)||1;
+      const r = (Number($('#heroInterest').value)||0)/100/12;
+      if (A<=0){ $('#heroResult').innerText='Enter a valid amount'; return; }
+      const m = (A*r)/(1-Math.pow(1+r,-n));
+      $('#heroResult').innerHTML = `<strong>Estimated monthly:</strong> ₹ ${m.toFixed(2)} • Total ₹ ${(m*n).toFixed(2)}`;
+    };
   </script>
+
 </body>
 </html>
