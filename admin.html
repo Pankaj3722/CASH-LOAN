@@ -1,86 +1,78 @@
 <!doctype html>
-<html lang="hi">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>LOAN PAY — Admin</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css">
   <style>
-    .admin-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
-    .table{width:100%;border-collapse:collapse}
-    .table th,.table td{padding:8px;border-bottom:1px solid #eee;text-align:left;font-size:13px}
-    .small-btn{padding:6px 8px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
-    .danger{background:#ffecec;border-color:#ffb3b3}
-    .green{background:#e6f6ff;border-color:#bfe4ff}
-    pre{white-space:pre-wrap;word-break:break-word}
+    body{font-family:Inter,system-ui,Arial;background:#f4f7fb;padding:18px}
+    .wrap{max-width:980px;margin:0 auto}
+    h1{margin:0 0 14px 0}
+    .controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    button{padding:8px 10px;border-radius:8px;border:none;background:#0b5eff;color:#fff;cursor:pointer}
+    button.ghost{background:#fff;color:#0b5eff;border:1px solid rgba(11,94,255,0.14)}
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.04)}
+    th,td{padding:10px;border-bottom:1px solid #f1f5fb;text-align:left;font-size:14px}
+    th{background:#fafcff}
+    .small{font-size:13px;color:#6b7280}
+    .status{margin-top:10px}
   </style>
 </head>
-<body class="page">
-  <main class="container">
-    <div class="card">
-      <div class="admin-header">
-        <div>
-          <h2>Admin Panel — LOAN PAY</h2>
-          <div class="muted">View & export submitted applications</div>
-        </div>
-        <div>
-          <input id="adminPass" placeholder="Admin password" style="padding:8px;border-radius:8px;border:1px solid #ddd" />
-          <button id="unlockBtn" class="small-btn">Unlock</button>
-        </div>
-      </div>
+<body>
+  <div class="wrap">
+    <h1>LOAN PAY — Admin Panel</h1>
+    <div class="small">View applications stored locally (or synced). Export CSV / Clear storage.</div>
 
-      <div id="adminArea" class="hidden">
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
-          <button id="refreshBtn" class="small-btn green">Refresh</button>
-          <button id="exportBtn" class="small-btn">Export CSV</button>
-          <button id="clearBtn" class="small-btn danger">Clear Local Data</button>
-          <div class="muted" style="margin-left:auto">Total: <span id="totalCount">0</span></div>
-        </div>
-
-        <div id="tableWrap"></div>
-
-        <h4 style="margin-top:14px">Raw JSON (localStorage)</h4>
-        <pre id="rawJson" style="max-height:220px;overflow:auto;background:#fafafa;padding:12px;border-radius:8px"></pre>
-      </div>
-
-      <div id="lockedNote">
-        <p class="muted">Enter admin password to view submissions.</p>
-      </div>
+    <div class="controls">
+      <button id="refreshBtn">Refresh</button>
+      <button id="exportCsv" class="ghost">Export CSV</button>
+      <button id="downloadJson" class="ghost">Download JSON</button>
+      <button id="clearBtn" class="ghost" onclick="confirmClear()">Clear All</button>
     </div>
-  </main>
+
+    <div id="count" class="small"></div>
+
+    <div style="overflow:auto">
+      <table id="appsTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Amount</th>
+            <th>Tenure</th>
+            <th>Interest</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="status" class="status small"></div>
+  </div>
 
 <script>
-  // ====== CONFIG: change this password to something secure BEFORE publishing ======
-  const ADMIN_PASSWORD = "loanadmin123"; // change this
-  // ==============================================================================
-
-  const unlockBtn = document.getElementById('unlockBtn');
-  const adminPass = document.getElementById('adminPass');
-  const adminArea = document.getElementById('adminArea');
-  const lockedNote = document.getElementById('lockedNote');
-  const tableWrap = document.getElementById('tableWrap');
-  const rawJson = document.getElementById('rawJson');
-  const totalCount = document.getElementById('totalCount');
-
-  function readApps() {
-    try {
-      const apps = JSON.parse(localStorage.getItem('loanpay_apps') || '[]');
+  function readApps(){
+    try{
+      let apps = JSON.parse(localStorage.getItem('loanpay_apps') || '[]');
       return Array.isArray(apps) ? apps : [];
-    } catch(e){ return []; }
+    }catch(e){ return []; }
   }
 
-  function renderTable() {
+  function render(){
     const apps = readApps();
-    totalCount.innerText = apps.length;
-    if (apps.length === 0) {
-      tableWrap.innerHTML = '<div class="muted">Koi application nahi mili (localStorage empty).</div>';
-      rawJson.innerText = JSON.stringify(apps, null, 2);
-      return;
-    }
-    let html = '<table class="table"><thead><tr><th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Amount</th><th>Tenure</th><th>Interest</th><th>Purpose</th><th>Date</th></tr></thead><tbody>';
+    const tbody = document.querySelector('#appsTable tbody');
+    tbody.innerHTML = '';
+    document.getElementById('count').innerText = 'Applications: ' + apps.length;
     apps.forEach((a,i) => {
-      html += `<tr>
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
         <td>${i+1}</td>
+        <td>${new Date(a.date || '').toLocaleString()}</td>
         <td>${escapeHtml(a.name||'')}</td>
         <td>${escapeHtml(a.email||'')}</td>
         <td>${escapeHtml(a.phone||'')}</td>
@@ -88,54 +80,69 @@
         <td>${a.tenure||''}</td>
         <td>${a.interest||''}%</td>
         <td>${escapeHtml(a.purpose||'')}</td>
-        <td>${escapeHtml(a.date||'')}</td>
-      </tr>`;
+      `;
+      tbody.appendChild(tr);
     });
-    html += '</tbody></table>';
-    tableWrap.innerHTML = html;
-    rawJson.innerText = JSON.stringify(readApps(), null, 2);
   }
 
-  function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); }
 
-  function exportCSV() {
+  function exportCsv(){
     const apps = readApps();
-    if (!apps.length) { alert('No applications to export'); return; }
-    const header = ['Name','Email','Phone','Amount','Tenure','Interest','Purpose','Date'];
-    const rows = apps.map(a => [a.name||'', a.email||'', a.phone||'', a.amount||'', a.tenure||'', a.interest||'', a.purpose||'', a.date||'']);
-    const csv = [header, ...rows].map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+    if(!apps.length){ alert('No applications to export'); return; }
+    const header = ['#','date','name','email','phone','amount','tenure','interest','purpose'];
+    const rows = apps.map((a,i)=>[
+      i+1,
+      a.date||'',
+      a.name||'',
+      a.email||'',
+      a.phone||'',
+      a.amount||'',
+      a.tenure||'',
+      a.interest||'',
+      a.purpose||''
+    ]);
+    const csv = [header, ...rows].map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'loanpay_applications.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'loanpay_applications.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    document.getElementById('status').innerText = 'CSV exported';
   }
 
-  function clearLocal() {
-    if (!confirm('Are you sure? This will remove local submissions.')) return;
+  function downloadJson(){
+    const apps = readApps();
+    const blob = new Blob([JSON.stringify(apps, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'loanpay_applications.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    document.getElementById('status').innerText = 'JSON downloaded';
+  }
+
+  function confirmClear(){
+    if(!confirm('Clear all saved applications from this browser? This cannot be undone.')) return;
     localStorage.removeItem('loanpay_apps');
-    renderTable();
-    alert('Local data cleared');
+    localStorage.removeItem('loanpay_user_email');
+    render();
+    document.getElementById('status').innerText = 'All local data cleared';
   }
 
-  unlockBtn.onclick = () => {
-    if (adminPass.value === ADMIN_PASSWORD) {
-      adminArea.classList.remove('hidden');
-      lockedNote.classList.add('hidden');
-      renderTable();
-    } else {
-      alert('Wrong password');
-    }
-  };
+  document.getElementById('refreshBtn').addEventListener('click', ()=>{ render(); document.getElementById('status').innerText='Refreshed'; });
+  document.getElementById('exportCsv').addEventListener('click', exportCsv);
+  document.getElementById('downloadJson').addEventListener('click', downloadJson);
 
-  document.getElementById('refreshBtn').onclick = renderTable;
-  document.getElementById('exportBtn').onclick = exportCSV;
-  document.getElementById('clearBtn').onclick = clearLocal;
-
-  // auto unlock if you previously unlocked during this session
-  if (sessionStorage.getItem('loanpay_admin')) {
-    adminArea.classList.remove('hidden');
-    lockedNote.classList.add('hidden');
-    renderTable();
-  }
+  // initial render
+  render();
 </script>
 </body>
 </html>
