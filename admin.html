@@ -1,182 +1,141 @@
 <!doctype html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>LOAN PAY — Admin</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    /* small overrides for admin */
-    body{background:#f4f7fb}
-    .admin-wrap{max-width:1000px;margin:18px auto;padding:18px}
-    .tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-    table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden}
-    th,td{padding:10px;border-bottom:1px solid #eef3ff;text-align:left;font-size:13px}
-    th{background:linear-gradient(90deg,#f8fbff,#ffffff);font-weight:700}
-    .smallmuted{color:#6b7280;font-size:13px}
-    .danger{background:#ffefef;color:#a00}
-    .ok{background:#e9fff2;color:#006a2e}
-    .btn-sm{padding:8px 10px;border-radius:8px;border:none;cursor:pointer}
+    .admin-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{padding:8px;border-bottom:1px solid #eee;text-align:left;font-size:13px}
+    .small-btn{padding:6px 8px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
+    .danger{background:#ffecec;border-color:#ffb3b3}
+    .green{background:#e6f6ff;border-color:#bfe4ff}
+    pre{white-space:pre-wrap;word-break:break-word}
   </style>
 </head>
-<body>
-  <main class="admin-wrap">
-    <h2>LOAN PAY — Admin Panel</h2>
-    <p class="smallmuted">Yahan se aap local submissions dekh, export aur delete kar sakte hain.</p>
-
-    <!-- optional simple auth -->
-    <div id="authBox" class="card" style="margin-top:12px;">
-      <label>Admin passcode (temporary):</label>
-      <input id="adminPass" placeholder="Enter admin code" />
-      <button id="authBtn" class="btn-sm">Unlock</button>
-      <span class="smallmuted" style="margin-left:8px">Default code: <strong>1234</strong></span>
-    </div>
-
-    <div id="panel" style="display:none">
-      <div class="tools">
-        <button id="refreshBtn" class="btn-sm">Refresh</button>
-        <button id="exportCsv" class="btn-sm">Export CSV</button>
-        <button id="exportJson" class="btn-sm">Export JSON</button>
-        <button id="downloadAll" class="btn-sm">Download All JSON</button>
-        <button id="deleteAll" class="btn-sm danger">Delete All</button>
-        <span id="count" class="smallmuted" style="margin-left:auto"></span>
+<body class="page">
+  <main class="container">
+    <div class="card">
+      <div class="admin-header">
+        <div>
+          <h2>Admin Panel — LOAN PAY</h2>
+          <div class="muted">View & export submitted applications</div>
+        </div>
+        <div>
+          <input id="adminPass" placeholder="Admin password" style="padding:8px;border-radius:8px;border:1px solid #ddd" />
+          <button id="unlockBtn" class="small-btn">Unlock</button>
+        </div>
       </div>
 
-      <div style="overflow:auto">
-        <table id="appsTable" role="table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Submitted</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Amount</th>
-              <th>Tenure</th>
-              <th>Interest</th>
-              <th>Purpose</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="appsBody"></tbody>
-        </table>
+      <div id="adminArea" class="hidden">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+          <button id="refreshBtn" class="small-btn green">Refresh</button>
+          <button id="exportBtn" class="small-btn">Export CSV</button>
+          <button id="clearBtn" class="small-btn danger">Clear Local Data</button>
+          <div class="muted" style="margin-left:auto">Total: <span id="totalCount">0</span></div>
+        </div>
+
+        <div id="tableWrap"></div>
+
+        <h4 style="margin-top:14px">Raw JSON (localStorage)</h4>
+        <pre id="rawJson" style="max-height:220px;overflow:auto;background:#fafafa;padding:12px;border-radius:8px"></pre>
+      </div>
+
+      <div id="lockedNote">
+        <p class="muted">Enter admin password to view submissions.</p>
       </div>
     </div>
   </main>
 
-  <script>
-    // ADMIN PANEL JS (client-only)
-    const STORAGE_KEY = 'loanpay_apps';
-    const ADMIN_CODE = '1234'; // change if you want
+<script>
+  // ====== CONFIG: change this password to something secure BEFORE publishing ======
+  const ADMIN_PASSWORD = "loanadmin123"; // change this
+  // ==============================================================================
 
-    const authBox = document.getElementById('authBox');
-    const authBtn = document.getElementById('authBtn');
-    const adminPass = document.getElementById('adminPass');
-    const panel = document.getElementById('panel');
+  const unlockBtn = document.getElementById('unlockBtn');
+  const adminPass = document.getElementById('adminPass');
+  const adminArea = document.getElementById('adminArea');
+  const lockedNote = document.getElementById('lockedNote');
+  const tableWrap = document.getElementById('tableWrap');
+  const rawJson = document.getElementById('rawJson');
+  const totalCount = document.getElementById('totalCount');
 
-    authBtn.onclick = () => {
-      if (adminPass.value === ADMIN_CODE) {
-        authBox.style.display = 'none';
-        panel.style.display = '';
-        loadApps();
-      } else {
-        alert('Wrong passcode');
-      }
-    };
+  function readApps() {
+    try {
+      const apps = JSON.parse(localStorage.getItem('loanpay_apps') || '[]');
+      return Array.isArray(apps) ? apps : [];
+    } catch(e){ return []; }
+  }
 
-    function loadApps() {
-      const body = document.getElementById('appsBody');
-      body.innerHTML = '';
-      const raw = localStorage.getItem(STORAGE_KEY) || '[]';
-      let apps = [];
-      try { apps = JSON.parse(raw); } catch(e){ apps = []; }
-      document.getElementById('count').innerText = apps.length + ' applications';
-      apps.forEach((a, i) => {
-        const tr = document.createElement('tr');
-        const date = new Date(a.date || Date.now()).toLocaleString();
-        tr.innerHTML = `
-          <td>${i+1}</td>
-          <td>${date}</td>
-          <td>${escapeHtml(a.name||'')}</td>
-          <td>${escapeHtml(a.email||'')}</td>
-          <td>${escapeHtml(a.phone||'')}</td>
-          <td>₹ ${a.amount||0}</td>
-          <td>${a.tenure||''}</td>
-          <td>${a.interest||''}%</td>
-          <td>${escapeHtml(a.purpose||'')}</td>
-          <td>
-            <button onclick="downloadItem(${i})" class="btn-sm">Download</button>
-            <button onclick="deleteItem(${i})" class="btn-sm danger">Delete</button>
-          </td>
-        `;
-        body.appendChild(tr);
-      });
+  function renderTable() {
+    const apps = readApps();
+    totalCount.innerText = apps.length;
+    if (apps.length === 0) {
+      tableWrap.innerHTML = '<div class="muted">Koi application nahi mili (localStorage empty).</div>';
+      rawJson.innerText = JSON.stringify(apps, null, 2);
+      return;
     }
+    let html = '<table class="table"><thead><tr><th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Amount</th><th>Tenure</th><th>Interest</th><th>Purpose</th><th>Date</th></tr></thead><tbody>';
+    apps.forEach((a,i) => {
+      html += `<tr>
+        <td>${i+1}</td>
+        <td>${escapeHtml(a.name||'')}</td>
+        <td>${escapeHtml(a.email||'')}</td>
+        <td>${escapeHtml(a.phone||'')}</td>
+        <td>₹ ${a.amount||0}</td>
+        <td>${a.tenure||''}</td>
+        <td>${a.interest||''}%</td>
+        <td>${escapeHtml(a.purpose||'')}</td>
+        <td>${escapeHtml(a.date||'')}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    tableWrap.innerHTML = html;
+    rawJson.innerText = JSON.stringify(readApps(), null, 2);
+  }
 
-    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
-    // exports
-    function toCSV(arr){
-      if(!arr || !arr.length) return '';
-      const keys = ['date','name','email','phone','amount','tenure','interest','purpose'];
-      const header = ['date','name','email','phone','amount','tenure','interest','purpose'];
-      const rows = arr.map(obj => keys.map(k => `"${String(obj[k]||'').replace(/"/g,'""')}"`).join(','));
-      return header.join(',') + '\\n' + rows.join('\\n');
+  function exportCSV() {
+    const apps = readApps();
+    if (!apps.length) { alert('No applications to export'); return; }
+    const header = ['Name','Email','Phone','Amount','Tenure','Interest','Purpose','Date'];
+    const rows = apps.map(a => [a.name||'', a.email||'', a.phone||'', a.amount||'', a.tenure||'', a.interest||'', a.purpose||'', a.date||'']);
+    const csv = [header, ...rows].map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'loanpay_applications.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  }
+
+  function clearLocal() {
+    if (!confirm('Are you sure? This will remove local submissions.')) return;
+    localStorage.removeItem('loanpay_apps');
+    renderTable();
+    alert('Local data cleared');
+  }
+
+  unlockBtn.onclick = () => {
+    if (adminPass.value === ADMIN_PASSWORD) {
+      adminArea.classList.remove('hidden');
+      lockedNote.classList.add('hidden');
+      renderTable();
+    } else {
+      alert('Wrong password');
     }
+  };
 
-    function download(filename, text) {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([text], {type: 'text/plain'}));
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
+  document.getElementById('refreshBtn').onclick = renderTable;
+  document.getElementById('exportBtn').onclick = exportCSV;
+  document.getElementById('clearBtn').onclick = clearLocal;
 
-    document.getElementById('refreshBtn').onclick = loadApps;
-    document.getElementById('exportCsv').onclick = () => {
-      const arr = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      const csv = toCSV(arr);
-      if(!csv) return alert('No applications to export');
-      download('loanpay_apps.csv', csv);
-    };
-    document.getElementById('exportJson').onclick = () => {
-      const arr = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      download('loanpay_apps.json', JSON.stringify(arr, null, 2));
-    };
-    document.getElementById('downloadAll').onclick = () => {
-      const arr = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      download('loanpay_all_'+Date.now()+'.json', JSON.stringify(arr, null, 2));
-    };
-    document.getElementById('deleteAll').onclick = () => {
-      if(!confirm('Delete ALL local applications? This cannot be undone.')) return;
-      localStorage.removeItem(STORAGE_KEY);
-      loadApps();
-      alert('All local applications deleted');
-    };
-
-    window.deleteItem = function(i){
-      const arr = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      if(!arr[i]) return;
-      if(!confirm('Delete this application?')) return;
-      arr.splice(i,1);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-      loadApps();
-    };
-
-    window.downloadItem = function(i){
-      const arr = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      if(!arr[i]) return alert('Item not found');
-      download('app_'+(i+1)+'.json', JSON.stringify(arr[i], null, 2));
-    };
-
-    // auto-load only after auth
-    // (optional: auto-unlock if no admin code wanted)
-    if (localStorage.getItem('loanpay_admin_unlocked') === '1') {
-      authBox.style.display = 'none';
-      panel.style.display = '';
-      loadApps();
-    }
-  </script>
+  // auto unlock if you previously unlocked during this session
+  if (sessionStorage.getItem('loanpay_admin')) {
+    adminArea.classList.remove('hidden');
+    lockedNote.classList.add('hidden');
+    renderTable();
+  }
+</script>
 </body>
 </html>
