@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LOAN PAY</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="TopBar">
+    <h1>LOAN PAY</h1>
+    <small>Simple loan application — Apply in 1 minute</small>
+  </header>
+
+  <main class="container">
+    <section id="signupSection" class="card">
+      <h2>Signup (Email)</h2>
+      <input id="emailInput" placeholder="Email (example@gmail.com)" />
+      <button id="signupBtn">Signup / Continue</button>
+    </section>
+
+    <section id="applySection" class="card hidden">
+      <h2>Apply for Loan</h2>
+      <label>Full name</label>
+      <input id="name" placeholder="Your name" />
+      <label>Phone</label>
+      <input id="phone" placeholder="91XXXXXXXXXX" />
+      <label>Amount (₹)</label>
+      <input id="amount" type="number" placeholder="10000" />
+      <label>Tenure (months)</label>
+      <input id="tenure" type="number" placeholder="6" />
+      <label>Interest % (annual)</label>
+      <input id="interest" type="number" placeholder="12" />
+      <label>Purpose</label>
+      <input id="purpose" placeholder="Purpose of loan" />
+      <button id="applyBtn">Submit Application</button>
+      <div id="status"></div>
+    </section>
+
+    <section class="card info">
+      <h3>Privacy</h3>
+      <p>We collect only name, email, phone and documents for processing. Data stored locally and optionally synced.</p>
+    </section>
+
+    <footer class="card small">
+      <p>Contact: <span id="contactEmail">contact@example.com</span></p>
+      <p>Install: browser menu → Add to Home screen</p>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
