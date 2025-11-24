@@ -1,0 +1,10 @@
+:root{font-family:Inter,system-ui,Arial;background:#f5f7fb;color:#0b1b3a}
+*{box-sizing:border-box}
+.TopBar{background:#0b5eff;color:white;padding:16px;text-align:center}
+.container{max-width:700px;margin:18px auto;padding:12px}
+.card{background:white;border-radius:8px;padding:12px;margin-bottom:12px;box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+.hidden{display:none}
+input{width:100%;padding:10px;margin:8px 0;border:1px solid #ddd;border-radius:6px}
+button{background:#0b5eff;color:white;border:none;padding:10px 12px;border-radius:6px;cursor:pointer}
+.small{font-size:13px;color:#444}
+.info p{margin:0}
