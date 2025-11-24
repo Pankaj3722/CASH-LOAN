@@ -3,139 +3,100 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-
   <title>LOAN PAY — Apply fast</title>
 
-  <!-- MAIN ICON -->
+  <!-- APP ICONS -->
   <link rel="icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png" />
-  <link rel="apple-touch-icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png"/>
+  <link rel="apple-touch-icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png" />
 
   <!-- MANIFEST -->
-  <link rel="manifest" href="manifest.json"/>
+  <link rel="manifest" href="manifest.json" />
 
   <!-- CSS -->
   <link rel="stylesheet" href="styles.css" />
-
-  <meta name="theme-color" content="#0b5eff"/>
+  <meta name="theme-color" content="#0b5eff" />
 </head>
 
 <body class="page">
 
-  <header class="topbar">
-    <div class="topbar-inner">
-
-      <div class="brand">
-        <img src="icons/file_0000000043a872078e5b55921c7e8ad.png" class="brand-icon" alt="Loan Pay"/>
-        <div>
-          <h1 class="brand-title">LOAN PAY</h1>
-          <div class="brand-sub">Fast • Simple • Safe</div>
-        </div>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <img src="icons/file_0000000043a872078e5b55921c7e8ad.png" class="brand-icon" alt="Loan Pay" />
+      <div>
+        <h1 class="brand-title">LOAN PAY</h1>
+        <div class="brand-sub">Fast • Simple • Safe</div>
       </div>
-
-      <nav class="top-actions">
-        <button id="installBtn" class="btn ghost" hidden>Install</button>
-      </nav>
-
     </div>
-  </header>
 
-  <main class="container">
+    <nav class="top-actions">
+      <button id="installBtn" class="btn ghost" hidden>Install</button>
+    </nav>
+  </div>
+</header>
 
-    <section class="hero card">
-      <h2>Apply for loan in 60 seconds</h2>
-      <p class="muted">Small loans, simple process. EMI estimate instantly — no signup.</p>
+<main class="container">
 
-      <div class="hero-grid">
-        <div>
-          <label class="label">Loan amount (₹)</label>
-          <input id="heroAmount" type="number" value="10000"/>
-        </div>
+<section class="hero card">
+<h2>Apply for loan in 60 seconds</h2>
+<p class="muted">Small loans, simple process. EMI estimate instantly — no signup.</p>
 
-        <div>
-          <label class="label">Tenure (months)</label>
-          <input id="heroTenure" type="number" value="12"/>
-        </div>
+<div class="hero-grid">
+  <div>
+    <label class="label">Loan amount (₹)</label>
+    <input id="heroAmount" type="number" value="10000" />
+  </div>
 
-        <div>
-          <label class="label">Interest %</label>
-          <input id="heroInterest" type="number" value="12"/>
-        </div>
+  <div>
+    <label class="label">Tenure (months)</label>
+    <input id="heroTenure" type="number" value="12" />
+  </div>
 
-        <div class="hero-actions">
-          <button id="heroCalc" class="btn primary">Estimate EMI</button>
-        </div>
-      </div>
+  <div>
+    <label class="label">Interest %</label>
+    <input id="heroInterest" type="number" value="12" />
+  </div>
 
-      <div id="heroResult" class="result"></div>
-    </section>
+  <div class="hero-actions">
+    <button id="heroCalc" class="btn primary">Estimate EMI</button>
+  </div>
+</div>
 
-    <section id="signupSection" class="card compact">
-      <h3>Signup</h3>
-      <div class="row">
-        <input id="emailInput" placeholder="Email (optional)"/>
-        <button id="signupBtn" class="btn">Continue</button>
-      </div>
-    </section>
+<div id="heroResult" class="result"></div>
 
-    <section id="applySection" class="card hidden">
-      <h3>Apply for Loan</h3>
+</section>
 
-      <div class="form-grid">
+<section id="signupSection" class="card compact">
+  <h3>Signup</h3>
+  <div class="row">
+    <input id="emailInput" placeholder="Email (optional)" />
+    <button id="signupBtn" class="btn">Continue</button>
+  </div>
+</section>
 
-        <div><label class="label">Full name</label><input id="name" /></div>
-        <div><label class="label">Phone</label><input id="phone"/></div>
-        <div><label class="label">Amount</label><input id="amount" type="number"/></div>
-        <div><label class="label">Tenure</label><input id="tenure" type="number"/></div>
-        <div><label class="label">Interest</label><input id="interest" type="number"/></div>
-        <div><label class="label">Purpose</label><input id="purpose"/></div>
+<section id="applySection" class="card hidden">
+  <h3>Apply for Loan</h3>
+  <div class="form-grid">
+    <div><label class="label">Full name</label><input id="name" /></div>
+    <div><label class="label">Phone</label><input id="phone" /></div>
+    <div><label class="label">Amount (₹)</label><input id="amount" type="number" /></div>
+    <div><label class="label">Tenure</label><input id="tenure" type="number" /></div>
+    <div><label class="label">Interest %</label><input id="interest" type="number" /></div>
+    <div><label class="label">Purpose</label><input id="purpose" /></div>
+  </div>
 
-      </div>
+  <div class="apply-actions">
+    <button id="applyBtn" class="btn primary">Submit Application</button>
+  </div>
+</section>
 
-      <div class="apply-actions">
-        <button id="applyBtn" class="btn primary">Submit Application</button>
-        <button id="clearLocal" class="btn ghost">Clear Local Data</button>
-      </div>
+<footer class="footer">
+  <div>Contact: <a href="mailto:contact@example.com">contact@example.com</a></div>
+</footer>
 
-      <div id="status" class="status muted"></div>
-    </section>
+</main>
 
-    <footer class="footer">
-      <div>Contact: <a href="mailto:contact@example.com">contact@example.com</a></div>
-      <div class="footer-right">Install: browser menu → Add to Home screen</div>
-    </footer>
-
-  </main>
-
-  <script src="app.js"></script>
-
-  <script>
-    let deferredPrompt;
-    const installBtn = document.getElementById("installBtn");
-
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.hidden = false;
-    });
-
-    installBtn.onclick = async () => {
-      deferredPrompt.prompt();
-      deferredPrompt = null;
-      installBtn.hidden = true;
-    };
-
-    document.getElementById("heroCalc").onclick = () => {
-      const A = Number(heroAmount.value);
-      const n = Number(heroTenure.value);
-      const r = Number(heroInterest.value)/100/12;
-
-      const emi = (A*r) / (1 - Math.pow(1+r, -n));
-      heroResult.innerHTML = `
-        <strong>Estimated EMI:</strong> ₹${emi.toFixed(2)}<br>
-        Total: ₹${(emi*n).toFixed(2)}
-      `;
-    };
-  </script>
+<script src="app.js"></script>
 
 </body>
 </html>
