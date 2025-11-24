@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>LOAN PAY — Admin</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* small admin-specific styles (keeps look similar) */
+    body{font-family:Inter,system-ui,Arial;background:#f4f7fb;color:#0b1b3a;padding:18px}
+    .wrap{max-width:1100px;margin:0 auto}
+    h1{margin:6px 0 18px 0}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    .btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer}
+    .btn.primary{background:#0b5eff;color:#fff}
+    .btn.warn{background:#ff6b6b;color:#fff}
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden}
+    th,td{padding:10px;border-bottom:1px solid #f0f2f7;text-align:left;font-size:14px}
+    th{background:#f8fbff}
+    .small{font-size:13px;color:#6b7280}
+    .empty{padding:40px;text-align:center;color:#6b7280}
+    .actions button{margin-right:6px}
+    pre{white-space:pre-wrap;word-break:break-word}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>LOAN PAY — Admin Panel</h1>
+
+    <div class="toolbar">
+      <button id="refreshBtn" class="btn">Refresh</button>
+      <button id="exportCsv" class="btn primary">Export CSV</button>
+      <button id="downloadJson" class="btn">Download JSON</button>
+      <button id="clearAll" class="btn warn">Delete All Local</button>
+      <div style="margin-left:auto" class="small">Data source: <code>localStorage → loanpay_apps</code></div>
+    </div>
+
+    <div id="tableWrap"></div>
+
+    <h3 class="small">How to use</h3>
+    <ul class="small">
+      <li>Users' applications are stored in browser <strong>localStorage</strong> under key <code>loanpay_apps</code>.</li>
+      <li>Open this admin page on same device/browser where submissions were made OR ask users to export and send JSON/CSV.</li>
+      <li>You can Export CSV / Download JSON or Delete all local entries from this page.</li>
+    </ul>
+  </div>
+
+  <script>
+    // Admin script: read loanpay_apps from localStorage, show table, export CSV, delete
+    function readApps() {
+      try {
+        return JSON.parse(localStorage.getItem('loanpay_apps') || '[]');
+      } catch(e) {
+        return [];
+      }
+    }
+
+    function render() {
+      const apps = readApps();
+      const wrap = document.getElementById('tableWrap');
+      if(!apps || apps.length === 0) {
+        wrap.innerHTML = '<div class="empty">Koi application nahi mila. (localStorage key: <code>loanpay_apps</code>)</div>';
+        return;
+      }
+
+      // Build table
+      let html = '<table><thead><tr>';
+      const headers = ['#','date','email','name','phone','amount','tenure','interest','purpose','raw'];
+      headers.forEach(h => html += '<th>' + h + '</th>');
+      html += '<th>Actions</th></tr></thead><tbody>';
+
+      apps.forEach((a,i) => {
+        html += '<tr>';
+        html += `<td>${i+1}</td>`;
+        html += `<td>${(a.date||'')}</td>`;
+        html += `<td>${escapeHtml(a.email||'')}</td>`;
+        html += `<td>${escapeHtml(a.name||'')}</td>`;
+        html += `<td>${escapeHtml(a.phone||'')}</td>`;
+        html += `<td>₹ ${Number(a.amount||0).toLocaleString()}</td>`;
+        html += `<td>${a.tenure||''}</td>`;
+        html += `<td>${a.interest||''}%</td>`;
+        html += `<td>${escapeHtml(a.purpose||'')}</td>`;
+        html += `<td><button onclick="viewRaw(${i})" class="btn">View</button></td>`;
+        html += `<td class="actions"><button onclick="deleteOne(${i})" class="btn warn">Delete</button></td>`;
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      wrap.innerHTML = html;
+    }
+
+    function escapeHtml(s) {
+      if(!s) return '';
+      return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; });
+    }
+
+    function viewRaw(i) {
+      const apps = readApps();
+      const data = apps[i];
+      const modal = window.open('', '_blank', 'noopener,noreferrer,width=600,height=600');
+      modal.document.write('<pre>' + escapeHtml(JSON.stringify(data, null, 2)) + '</pre>');
+      modal.document.title = 'Application ' + (i+1);
+    }
+
+    function deleteOne(i) {
+      if(!confirm('Are you sure to delete this application?')) return;
+      const apps = readApps();
+      apps.splice(i,1);
+      localStorage.setItem('loanpay_apps', JSON.stringify(apps));
+      render();
+    }
+
+    function clearAll() {
+      if(!confirm('Delete ALL local applications? This cannot be undone.')) return;
+      localStorage.removeItem('loanpay_apps');
+      render();
+    }
+
+    function download(filename, text) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([text], {type:'text/plain'}));
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    function exportCsv() {
+      const apps = readApps();
+      if(!apps || apps.length === 0) { alert('No applications to export'); return; }
+      // CSV headers
+      const keys = ['date','email','name','phone','amount','tenure','interest','purpose'];
+      const rows = [keys.join(',')];
+      apps.forEach(a => {
+        const row = keys.map(k => {
+          let v = a[k] === undefined ? '' : String(a[k]).replace(/"/g,'""');
+          // wrap in quotes
+          return `"${v}"`;
+        }).join(',');
+        rows.push(row);
+      });
+      const csv = rows.join('\\n');
+      download('loanpay-applications.csv', csv);
+    }
+
+    function downloadJson() {
+      const apps = readApps();
+      download('loanpay-applications.json', JSON.stringify(apps, null, 2));
+    }
+
+    // buttons
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('refreshBtn').addEventListener('click', render);
+      document.getElementById('exportCsv').addEventListener('click', exportCsv);
+      document.getElementById('downloadJson').addEventListener('click', downloadJson);
+      document.getElementById('clearAll').addEventListener('click', clearAll);
+      render();
+    });
+  </script>
+</body>
+</html>
