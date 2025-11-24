@@ -100,3 +100,132 @@ document.getElementById("applyBtn").onclick = () => {
 
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loan Pay - Apply Loan</title>
+
+<!-- Stylish CSS -->
+<style>
+    body{
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg,#0b5eff,#4aa3ff);
+        margin:0; padding:0;
+    }
+
+    .container{
+        max-width: 480px;
+        margin: auto;
+        background:#ffffff;
+        padding: 20px;
+        border-radius: 20px;
+        margin-top: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    h2{
+        text-align:center;
+        color:#0b5eff;
+        font-size:28px;
+        margin-bottom: 10px;
+    }
+
+    label{
+        font-weight:600;
+        margin-top:10px;
+        display:block;
+        color:#333;
+    }
+
+    input{
+        width:100%;
+        padding:12px;
+        border-radius:10px;
+        border:1px solid #ddd;
+        margin-top:5px;
+        font-size:16px;
+    }
+
+    .btn{
+        background:#0b5eff;
+        color:#fff;
+        border:0;
+        width:100%;
+        padding:14px;
+        margin-top:15px;
+        border-radius:12px;
+        font-size:18px;
+        font-weight:600;
+        box-shadow:0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .note{
+        margin-top:20px;
+        padding:15px;
+        background:#e9f1ff;
+        border-left:5px solid #0b5eff;
+        border-radius:10px;
+        font-size:14px;
+        color:#333;
+    }
+
+    .section-title{
+        font-size:20px;
+        margin-top:20px;
+        color:#0b5eff;
+        font-weight:700;
+    }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <h2>Apply For Loan</h2>
+
+    <label>Full Name</label>
+    <input type="text" placeholder="Your Name">
+
+    <label>Phone Number</label>
+    <input type="number" placeholder="91XXXXXXXX">
+
+    <label>Loan Amount (₹)</label>
+    <input type="number" value="15000">
+
+    <label>Tenure (Months)</label>
+    <input type="number" value="6">
+
+    <label>Interest % (Annual)</label>
+    <input type="number" value="12">
+
+    <label>CIBIL Score</label>
+    <input type="number" placeholder="350+">
+    
+    <p style="margin-top:5px;color:#444;">✔ Minimum CIBIL Required: <b>350</b></p>
+
+    <h3 class="section-title">Upload Documents</h3>
+
+    <label>Aadhaar Upload</label>
+    <input type="file">
+
+    <label>PAN Card Upload</label>
+    <input type="file">
+
+    <label>Selfie Upload</label>
+    <input type="file">
+
+    <button class="btn">Submit Application</button>
+
+    <div class="note">
+        <b>Note:</b> Your documents are verified by our Apoorv system.  
+        Wrong details = <b>Rejection</b>.
+    </div>
+
+</div>
+
+</body>
+</html>
