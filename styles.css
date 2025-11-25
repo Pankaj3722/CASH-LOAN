@@ -1,69 +1,105 @@
-:root{
-  --bg:#f4f7fb;
-  --card:#ffffff;
-  --muted:#7b8794;
-  --accent:#1565ff; /* primary accent */
-  --accent-2:#00bfa5; /* secondary */
-  --radius:14px;
-  --shadow-1: 0 6px 18px rgba(20,30,50,0.08);
-  --shadow-2: 0 10px 30px rgba(20,30,50,0.09);
-  --glass: rgba(255,255,255,0.6);
-  --text:#0f1724;
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+/* Global */
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(180deg, #002b4f 0%, #004d7a 40%, #007091 100%);
+  color: white;
+  min-height: 100vh;
 }
 
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  background: linear-gradient(180deg,#f7fbff 0%, var(--bg) 100%);
-  color:var(--text);
-  padding:18px;
-  -webkit-font-smoothing:antialiased;
+/* Header */
+.topbar {
+  padding: 16px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
 }
 
-.container{max-width:920px;margin:18px auto;padding:18px}
-
-/* Topbar */
-.topbar{position:sticky;top:0;background:transparent;padding:10px 0;z-index:10}
-.topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{display:flex;align-items:center;gap:12px}
-.brand-icon{width:48px;height:48px;border-radius:12px;object-fit:cover;box-shadow: var(--shadow-1)}
-.brand-title{font-size:18px;margin:0}
-.brand-sub{font-size:12px;color:var(--muted)}
-
-/* Card */
-.card{background:var(--card);border-radius:var(--radius);padding:18px;margin-bottom:14px;box-shadow:var(--shadow-2)}
-.compact{padding:12px}
-
-/* Hero */
-.hero h2{margin:0 0 8px 0;font-size:22px}
-.muted{color:var(--muted);font-size:14px}
-.hero-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
-.hero-grid input{width:100%;padding:12px;border-radius:10px;border:1px solid #e6e9ee}
-
-/* Buttons */
-.btn{display:inline-block;padding:10px 14px;border-radius:10px;border:none;background:transparent;cursor:pointer;font-weight:600}
-.btn.primary{background:linear-gradient(90deg,var(--accent), #2a7bff);color:white;box-shadow:0 12px 30px rgba(21,101,255,0.15)}
-.btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06)}
-
-/* form layout */
-.form-grid{display:grid;grid-template-columns:1fr;gap:10px}
-.form-grid input[type="text"], .form-grid input[type="number"], input[type="file"]{
-  padding:12px;border-radius:10px;border:1px solid #e8ebf1;width:100%;
+.brand-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-/* small helpers */
-.apply-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-.status{margin-top:10px;color:var(--muted)}
+.brand-logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+}
 
-/* footer */
-.footer{display:flex;justify-content:space-between;align-items:center;padding-top:10px;font-size:13px;color:var(--muted)}
-.footer a{color:var(--accent);text-decoration:none}
+.brand-title {
+  font-size: 20px;
+  margin: 0;
+}
 
-/* responsive */
-@media (max-width:720px){
-  .hero-grid{grid-template-columns:1fr}
-  .container{padding:12px}
-  .brand-title{font-size:16px}
+.brand-sub {
+  font-size: 12px;
+  margin: 0;
+  opacity: 0.7;
+}
+
+/* Login / Apply Box */
+.login-box {
+  background: rgba(255,255,255,0.08);
+  padding: 20px;
+  margin: 40px auto;
+  width: 90%;
+  max-width: 380px;
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.box-title {
+  margin: 0;
+  font-size: 22px;
+  text-align: center;
+}
+
+.box-sub {
+  margin: 5px 0 20px 0;
+  text-align: center;
+  opacity: 0.8;
+}
+
+/* Inputs */
+label {
+  font-size: 14px;
+  margin-top: 12px;
+  display: block;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  font-size: 15px;
+}
+
+/* Button */
+.btn-primary {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  background: linear-gradient(90deg,#00c6ff,#0072ff);
+  border: none;
+  border-radius: 12px;
+  font-size: 17px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Status message */
+.status {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
 }
