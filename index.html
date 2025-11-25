@@ -5,20 +5,20 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>LOAN PAY — Apply fast</title>
 
-  <!-- PWA manifest + icons (check your icon filename in icons/ ) -->
+  <!-- PWA manifest & icons -->
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png.png" />
-  <link rel="apple-touch-icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png.png" />
-
-  <!-- styles -->
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <meta name="theme-color" content="#1565ff" />
+
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="page">
+
   <header class="topbar">
-    <div class="container topbar-inner">
+    <div class="topbar-inner">
       <div class="brand">
-        <img src="icons/file_0000000043a872078e5b55921c7e8ad.png.png" alt="Loan Pay" class="brand-icon"/>
+        <img src="icons/icon-192.png" alt="Loan Pay" class="brand-icon"/>
         <div>
           <h1 class="brand-title">LOAN PAY</h1>
           <div class="brand-sub">Fast • Simple • Safe</div>
@@ -32,69 +32,88 @@
 
   <main class="container">
     <section class="hero card">
-      <h2>Apply For Loan</h2>
+      <h2>Apply for loan in 60 seconds</h2>
+      <p class="muted">Small loans, simple process. EMI estimate instantly — no signup.</p>
+
+      <div class="hero-grid">
+        <div>
+          <label class="label">Loan amount (₹)</label>
+          <input id="heroAmount" type="number" placeholder="10000" value="10000" />
+        </div>
+        <div>
+          <label class="label">Tenure (months)</label>
+          <input id="heroTenure" type="number" placeholder="12" value="12" />
+        </div>
+        <div>
+          <label class="label">Interest % (annual)</label>
+          <input id="heroInterest" type="number" placeholder="12" value="12" />
+        </div>
+        <div class="hero-actions">
+          <button id="heroCalc" class="btn primary">Estimate EMI</button>
+        </div>
+      </div>
+
+      <div id="heroResult" class="result"></div>
+    </section>
+
+    <section id="signupSection" class="card compact">
+      <h3>Signup (email optional)</h3>
+      <div class="row">
+        <input id="emailInput" placeholder="Email (example@gmail.com)" />
+        <button id="signupBtn" class="btn">Continue</button>
+      </div>
+      <div class="muted small">Your email is only used to contact you about the application.</div>
+    </section>
+
+    <section id="applySection" class="card">
+      <h3>Apply For Loan</h3>
 
       <div class="form-grid">
-        <label>Full Name
-          <input id="name" placeholder="Your Name" />
-        </label>
+        <label>Full Name</label>
+        <input id="name" placeholder="Your Name" />
 
-        <label>Phone Number
-          <input id="phone" placeholder="91XXXXXXXXXX" />
-        </label>
+        <label>Phone Number</label>
+        <input id="phone" placeholder="91XXXXXXXXXX" />
 
-        <label>Loan Amount (₹)
-          <input id="amount" type="number" value="15000" />
-        </label>
+        <label>Loan Amount (₹)</label>
+        <input id="amount" type="number" value="15000" />
 
-        <label>Tenure (Months)
-          <input id="tenure" type="number" value="6" />
-        </label>
+        <label>Tenure (Months)</label>
+        <input id="tenure" type="number" value="6" />
 
-        <label>Interest % (Annual)
-          <input id="interest" type="number" value="12" />
-        </label>
+        <label>Interest % (Annual)</label>
+        <input id="interest" type="number" value="12" />
 
-        <label>CIBIL Score
-          <input id="cibil" placeholder="350+" value="350" />
-        </label>
+        <label>CIBIL Score</label>
+        <input id="cibil" type="number" placeholder="350" value="350" />
       </div>
 
-      <div class="muted">Minimum CIBIL Required: <strong id="minCibil">350</strong></div>
+      <div class="muted small">Minimum CIBIL Required: <strong>350</strong></div>
 
-      <hr/>
+      <hr>
 
-      <h3>Upload Documents</h3>
-      <div class="uploads">
-        <label>Aadhaar (front)
-          <input id="aadhaar" type="file" accept="image/*,application/pdf" />
-        </label>
-        <label>PAN
-          <input id="pan" type="file" accept="image/*,application/pdf" />
-        </label>
-        <label>Selfie
-          <input id="selfie" type="file" accept="image/*" />
-        </label>
-      </div>
+      <h4>Upload Documents</h4>
+      <label>Aadhaar (front)</label><input type="file" id="aadhaar" accept="image/*,application/pdf" />
+      <label>PAN (card)</label><input type="file" id="pan" accept="image/*,application/pdf" />
+      <label>Selfie</label><input type="file" id="selfie" accept="image/*" />
 
       <div class="apply-actions">
-        <button id="submitBtn" class="btn primary">Submit Application</button>
+        <button id="applyBtn" class="btn primary">Submit Application</button>
+        <button id="clearLocal" class="btn ghost">Clear Local Data</button>
       </div>
 
       <div id="status" class="status muted"></div>
-
-      <div class="note card small muted">
-        Note: Your documents are checked by our Apoorv Verification system. Wrong details = Rejection.
-      </div>
     </section>
-  </main>
 
-  <footer class="footer">
-    <div class="container">
-      <div>Contact: <a href="mailto:contact@example.com">contact@example.com</a></div>
+    <section class="card small muted">
+      <strong>Note:</strong> Documents are checked by our verification system. Wrong details = Rejection.
+    </section>
+
+    <footer class="footer">
+      <div>Contact: <a id="contactEmail" href="mailto:contact@example.com">contact@example.com</a></div>
       <div class="footer-right">Install: browser menu → Add to Home screen</div>
-    </div>
-  </footer>
+    </footer>
+  </main>
 
   <script src="app.js"></script>
 </body>
