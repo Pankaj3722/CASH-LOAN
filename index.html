@@ -3,229 +3,99 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>LOAN PAY — Loan Apply</title>
+  <title>LOAN PAY — Apply fast</title>
 
-  <!-- ICON -->
+  <!-- PWA manifest + icons (check your icon filename in icons/ ) -->
+  <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png.png" />
   <link rel="apple-touch-icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png.png" />
 
-  <link rel="manifest" href="manifest.json" />
+  <!-- styles -->
   <link rel="stylesheet" href="styles.css" />
+  <meta name="theme-color" content="#1565ff" />
 </head>
-
 <body class="page">
-
   <header class="topbar">
-    <div class="brand">
-      <img src="icons/file_0000000043a872078e5b55921c7e8ad.png.png" class="brand-icon">
-      <h1 class="brand-title">LOAN PAY</h1>
+    <div class="container topbar-inner">
+      <div class="brand">
+        <img src="icons/file_0000000043a872078e5b55921c7e8ad.png.png" alt="Loan Pay" class="brand-icon"/>
+        <div>
+          <h1 class="brand-title">LOAN PAY</h1>
+          <div class="brand-sub">Fast • Simple • Safe</div>
+        </div>
+      </div>
+      <nav class="top-actions">
+        <button id="installBtn" class="btn ghost" hidden>Install</button>
+      </nav>
     </div>
   </header>
 
   <main class="container">
-
-    <!-- Loan Apply Form -->
-    <section class="card">
+    <section class="hero card">
       <h2>Apply For Loan</h2>
 
-      <label>Full Name</label>
-      <input id="fullName" placeholder="Your Name">
+      <div class="form-grid">
+        <label>Full Name
+          <input id="name" placeholder="Your Name" />
+        </label>
 
-      <label>Phone Number</label>
-      <input id="phone" placeholder="91XXXXXXXXXX">
+        <label>Phone Number
+          <input id="phone" placeholder="91XXXXXXXXXX" />
+        </label>
 
-      <label>Loan Amount (₹)</label>
-      <input id="amount" type="number" placeholder="15000">
+        <label>Loan Amount (₹)
+          <input id="amount" type="number" value="15000" />
+        </label>
 
-      <label>Tenure (Months)</label>
-      <input id="tenure" type="number" placeholder="6">
+        <label>Tenure (Months)
+          <input id="tenure" type="number" value="6" />
+        </label>
 
-      <label>Interest % (Annual)</label>
-      <input id="interest" type="number" placeholder="12">
+        <label>Interest % (Annual)
+          <input id="interest" type="number" value="12" />
+        </label>
 
-      <label>CIBIL Score</label>
-      <input id="cibil" type="number" placeholder="350+" />
+        <label>CIBIL Score
+          <input id="cibil" placeholder="350+" value="350" />
+        </label>
+      </div>
 
-      <p class="muted small">Minimum CIBIL Required: <strong>350</strong></p>
+      <div class="muted">Minimum CIBIL Required: <strong id="minCibil">350</strong></div>
 
-      <hr>
+      <hr/>
 
       <h3>Upload Documents</h3>
+      <div class="uploads">
+        <label>Aadhaar (front)
+          <input id="aadhaar" type="file" accept="image/*,application/pdf" />
+        </label>
+        <label>PAN
+          <input id="pan" type="file" accept="image/*,application/pdf" />
+        </label>
+        <label>Selfie
+          <input id="selfie" type="file" accept="image/*" />
+        </label>
+      </div>
 
-      <label>Aadhaar Upload</label>
-      <input id="aadhaar" type="file" accept="image/*,application/pdf">
+      <div class="apply-actions">
+        <button id="submitBtn" class="btn primary">Submit Application</button>
+      </div>
 
-      <label>PAN Card Upload</label>
-      <input id="pan" type="file" accept="image/*,application/pdf">
+      <div id="status" class="status muted"></div>
 
-      <label>Selfie Upload</label>
-      <input id="selfie" type="file" accept="image/*">
-
-      <button id="applyBtn" class="btn primary">Submit Application</button>
-
-      <div id="applyStatus" class="status"></div>
+      <div class="note card small muted">
+        Note: Your documents are checked by our Apoorv Verification system. Wrong details = Rejection.
+      </div>
     </section>
-
-    <section class="card small">
-      <strong>Note:</strong> Your documents are checked by our Apoorv Verification system.  
-      Wrong details = Rejection.
-    </section>
-
   </main>
 
-<script>
-document.getElementById("applyBtn").onclick = () => {
-  const name = document.getElementById("fullName").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const amount = Number(document.getElementById("amount").value);
-  const tenure = Number(document.getElementById("tenure").value);
-  const interest = Number(document.getElementById("interest").value);
-  const cibil = Number(document.getElementById("cibil").value);
-
-  const status = document.getElementById("applyStatus");
-
-  if (!name || !phone || !amount || !tenure || !interest || !cibil) {
-    status.innerHTML = "<span style='color:red'>Please fill all fields.</span>";
-    return;
-  }
-
-  if (cibil < 350) {
-    status.innerHTML = "<span style='color:red'>❌ Rejected — Minimum CIBIL 350 required.</span>";
-    return;
-  }
-
-  status.innerHTML = "<span style='color:green'>✔ Application Submitted Successfully! Apoorv Verification Pending.</span>";
-};
-</script>
-
-</body>
-</html>
-
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Loan Pay - Apply Loan</title>
-
-<!-- Stylish CSS -->
-<style>
-    body{
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg,#0b5eff,#4aa3ff);
-        margin:0; padding:0;
-    }
-
-    .container{
-        max-width: 480px;
-        margin: auto;
-        background:#ffffff;
-        padding: 20px;
-        border-radius: 20px;
-        margin-top: 20px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
-
-    h2{
-        text-align:center;
-        color:#0b5eff;
-        font-size:28px;
-        margin-bottom: 10px;
-    }
-
-    label{
-        font-weight:600;
-        margin-top:10px;
-        display:block;
-        color:#333;
-    }
-
-    input{
-        width:100%;
-        padding:12px;
-        border-radius:10px;
-        border:1px solid #ddd;
-        margin-top:5px;
-        font-size:16px;
-    }
-
-    .btn{
-        background:#0b5eff;
-        color:#fff;
-        border:0;
-        width:100%;
-        padding:14px;
-        margin-top:15px;
-        border-radius:12px;
-        font-size:18px;
-        font-weight:600;
-        box-shadow:0 4px 10px rgba(0,0,0,0.2);
-    }
-
-    .note{
-        margin-top:20px;
-        padding:15px;
-        background:#e9f1ff;
-        border-left:5px solid #0b5eff;
-        border-radius:10px;
-        font-size:14px;
-        color:#333;
-    }
-
-    .section-title{
-        font-size:20px;
-        margin-top:20px;
-        color:#0b5eff;
-        font-weight:700;
-    }
-</style>
-
-</head>
-<body>
-
-<div class="container">
-
-    <h2>Apply For Loan</h2>
-
-    <label>Full Name</label>
-    <input type="text" placeholder="Your Name">
-
-    <label>Phone Number</label>
-    <input type="number" placeholder="91XXXXXXXX">
-
-    <label>Loan Amount (₹)</label>
-    <input type="number" value="15000">
-
-    <label>Tenure (Months)</label>
-    <input type="number" value="6">
-
-    <label>Interest % (Annual)</label>
-    <input type="number" value="12">
-
-    <label>CIBIL Score</label>
-    <input type="number" placeholder="350+">
-    
-    <p style="margin-top:5px;color:#444;">✔ Minimum CIBIL Required: <b>350</b></p>
-
-    <h3 class="section-title">Upload Documents</h3>
-
-    <label>Aadhaar Upload</label>
-    <input type="file">
-
-    <label>PAN Card Upload</label>
-    <input type="file">
-
-    <label>Selfie Upload</label>
-    <input type="file">
-
-    <button class="btn">Submit Application</button>
-
-    <div class="note">
-        <b>Note:</b> Your documents are verified by our Apoorv system.  
-        Wrong details = <b>Rejection</b>.
+  <footer class="footer">
+    <div class="container">
+      <div>Contact: <a href="mailto:contact@example.com">contact@example.com</a></div>
+      <div class="footer-right">Install: browser menu → Add to Home screen</div>
     </div>
+  </footer>
 
-</div>
-
+  <script src="app.js"></script>
 </body>
 </html>
