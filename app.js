@@ -1,61 +1,70 @@
-// Simple PWA client-only app. Stores applications in localStorage as fallback.
-// Replace contactEmail below with your real contact before publishing.
-const contactEmail = "contact@example.com";
-document.getElementById('contactEmail').innerText = contactEmail;
+// app.js - simple frontend checks and UI actions
+(function(){
+  const minCibil = 350;
+  document.getElementById('minCibil').innerText = minCibil;
 
-// Register service worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js').catch(err => console.log('SW err', err));
-}
+  // Install prompt PWA
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.hidden = false;
+  });
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    installBtn.hidden = true;
+  });
 
-// Signup flow (email-only)
-const signupSection = document.getElementById('signupSection');
-const applySection = document.getElementById('applySection');
-const emailInput = document.getElementById('emailInput');
-const signupBtn = document.getElementById('signupBtn');
+  // submit handler
+  const submitBtn = document.getElementById('submitBtn');
+  const status = document.getElementById('status');
 
-signupBtn.onclick = () => {
-  const email = emailInput.value.trim();
-  if (!email || !email.includes('@')) { alert('Valid email required'); return; }
-  localStorage.setItem('loanpay_user_email', email);
-  signupSection.classList.add('hidden');
-  applySection.classList.remove('hidden');
-};
+  function showStatus(msg, ok=true){
+    status.innerText = msg;
+    status.style.color = ok ? '#0f5132' : '#7a1b1b';
+    status.style.background = ok ? 'rgba(16,185,129,0.06)' : 'rgba(255,0,0,0.04)';
+    status.style.padding = '12px';
+    status.style.borderRadius = '10px';
+  }
 
-// Apply form
-document.getElementById('applyBtn').onclick = () => {
-  const app = {
-    email: localStorage.getItem('loanpay_user_email') || '',
-    name: document.getElementById('name').value.trim(),
-    phone: document.getElementById('phone').value.trim(),
-    amount: Number(document.getElementById('amount').value),
-    tenure: Number(document.getElementById('tenure').value),
-    interest: Number(document.getElementById('interest').value),
-    purpose: document.getElementById('purpose').value.trim(),
-    date: new Date().toISOString()
-  };
-  if (!app.name || !app.amount || !app.tenure) { alert('Name, amount and tenure required'); return; }
+  submitBtn.addEventListener('click', ()=>{
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const amount = Number(document.getElementById('amount').value);
+    const tenure = Number(document.getElementById('tenure').value);
+    const interest = Number(document.getElementById('interest').value);
+    const cibil = Number(document.getElementById('cibil').value);
 
-  // Save locally
-  let apps = JSON.parse(localStorage.getItem('loanpay_apps') || '[]');
-  apps.push(app);
-  localStorage.setItem('loanpay_apps', JSON.stringify(apps));
+    const aadhaarFile = document.getElementById('aadhaar').files[0];
+    const panFile = document.getElementById('pan').files[0];
+    const selfieFile = document.getElementById('selfie').files[0];
 
-  // Show basic amortization example (simple interest)
-  const monthlyInterestRate = (app.interest/100)/12;
-  const monthlyPayment = ((app.amount * monthlyInterestRate) / (1 - Math.pow(1+monthlyInterestRate, -app.tenure))).toFixed(2);
-  document.getElementById('status').innerHTML = `<strong>Submitted.</strong> Monthly ≈ ₹ ${monthlyPayment}`;
-  // Clear form
-  document.getElementById('name').value = '';
-  document.getElementById('phone').value = '';
-  document.getElementById('amount').value = '';
-  document.getElementById('tenure').value = '';
-  document.getElementById('interest').value = '';
-  document.getElementById('purpose').value = '';
-};
+    if (!name) { showStatus('Enter full name', false); return; }
+    if (!phone || phone.length < 10) { showStatus('Enter valid phone', false); return; }
+    if (!amount || amount < 1000) { showStatus('Enter loan amount (min 1000)', false); return; }
+    if (!tenure || tenure <= 0) { showStatus('Enter tenure months', false); return; }
+    if (Number.isNaN(cibil) || cibil < minCibil) { showStatus('CIBIL too low — minimum required: ' + minCibil, false); return; }
 
-// If already signed up, show apply
-if (localStorage.getItem('loanpay_user_email')) {
-  signupSection.classList.add('hidden');
-  applySection.classList.remove('hidden');
-}
+    // require uploads
+    if (!aadhaarFile || !panFile || !selfieFile){ showStatus('Please upload Aadhaar, PAN and Selfie', false); return; }
+
+    showStatus('Submitting application — please wait...');
+
+    // Simple simulate upload + local save
+    setTimeout(()=>{
+      // store local copy
+      const entry = { name, phone, amount, tenure, interest, cibil, time: Date.now() };
+      const list = JSON.parse(localStorage.getItem('loan_apps')||'[]');
+      list.unshift(entry);
+      localStorage.setItem('loan_apps', JSON.stringify(list));
+
+      showStatus('Application submitted successfully. Our team will review documents. (This is demo frontend only.)');
+      // clear (optional)
+      // document.getElementById('name').value = '';
+    }, 1200);
+  });
+})();
