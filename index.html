@@ -3,118 +3,70 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>LOAN PAY — Apply fast</title>
+  <title>LOAN PAY – Instant Loan</title>
 
-  <!-- PWA manifest & icons -->
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <meta name="theme-color" content="#1565ff" />
+  <!-- Manifest + Icon -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png.png">
+  <link rel="apple-touch-icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png.png">
 
+  <!-- CSS -->
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="page">
 
+<body>
+
+  <!-- TOP HEADER -->
   <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <img src="icons/icon-192.png" alt="Loan Pay" class="brand-icon"/>
-        <div>
-          <h1 class="brand-title">LOAN PAY</h1>
-          <div class="brand-sub">Fast • Simple • Safe</div>
-        </div>
+    <div class="brand-box">
+      <img src="icons/file_0000000043a872078e5b55921c7e8ad.png.png" class="brand-logo">
+      <div>
+        <h1 class="brand-title">LOAN PAY</h1>
+        <p class="brand-sub">Instant Loan • Secure • Fast</p>
       </div>
-      <nav class="top-actions">
-        <button id="installBtn" class="btn ghost" hidden>Install</button>
-      </nav>
     </div>
   </header>
 
-  <main class="container">
-    <section class="hero card">
-      <h2>Apply for loan in 60 seconds</h2>
-      <p class="muted">Small loans, simple process. EMI estimate instantly — no signup.</p>
+  <main>
 
-      <div class="hero-grid">
-        <div>
-          <label class="label">Loan amount (₹)</label>
-          <input id="heroAmount" type="number" placeholder="10000" value="10000" />
-        </div>
-        <div>
-          <label class="label">Tenure (months)</label>
-          <input id="heroTenure" type="number" placeholder="12" value="12" />
-        </div>
-        <div>
-          <label class="label">Interest % (annual)</label>
-          <input id="heroInterest" type="number" placeholder="12" value="12" />
-        </div>
-        <div class="hero-actions">
-          <button id="heroCalc" class="btn primary">Estimate EMI</button>
-        </div>
-      </div>
+    <!-- LOGIN BOX (credittnow style) -->
+    <section class="login-box">
+      <h2 class="box-title">Get Instant Loan</h2>
+      <p class="box-sub">Fill your basic details to check eligibility</p>
 
-      <div id="heroResult" class="result"></div>
+      <label>Full Name</label>
+      <input type="text" id="name" placeholder="Enter full name">
+
+      <label>Mobile Number</label>
+      <input type="text" id="phone" placeholder="Enter mobile number">
+
+      <label>Loan Amount (₹)</label>
+      <input type="number" id="amount" placeholder="50,000">
+
+      <label>CIBIL Score (minimum 350)</label>
+      <input type="number" id="cibil" placeholder="350">
+
+      <button id="applyBtn" class="btn-primary">Check Eligibility</button>
+
+      <p id="status" class="status"></p>
     </section>
 
-    <section id="signupSection" class="card compact">
-      <h3>Signup (email optional)</h3>
-      <div class="row">
-        <input id="emailInput" placeholder="Email (example@gmail.com)" />
-        <button id="signupBtn" class="btn">Continue</button>
-      </div>
-      <div class="muted small">Your email is only used to contact you about the application.</div>
-    </section>
-
-    <section id="applySection" class="card">
-      <h3>Apply For Loan</h3>
-
-      <div class="form-grid">
-        <label>Full Name</label>
-        <input id="name" placeholder="Your Name" />
-
-        <label>Phone Number</label>
-        <input id="phone" placeholder="91XXXXXXXXXX" />
-
-        <label>Loan Amount (₹)</label>
-        <input id="amount" type="number" value="15000" />
-
-        <label>Tenure (Months)</label>
-        <input id="tenure" type="number" value="6" />
-
-        <label>Interest % (Annual)</label>
-        <input id="interest" type="number" value="12" />
-
-        <label>CIBIL Score</label>
-        <input id="cibil" type="number" placeholder="350" value="350" />
-      </div>
-
-      <div class="muted small">Minimum CIBIL Required: <strong>350</strong></div>
-
-      <hr>
-
-      <h4>Upload Documents</h4>
-      <label>Aadhaar (front)</label><input type="file" id="aadhaar" accept="image/*,application/pdf" />
-      <label>PAN (card)</label><input type="file" id="pan" accept="image/*,application/pdf" />
-      <label>Selfie</label><input type="file" id="selfie" accept="image/*" />
-
-      <div class="apply-actions">
-        <button id="applyBtn" class="btn primary">Submit Application</button>
-        <button id="clearLocal" class="btn ghost">Clear Local Data</button>
-      </div>
-
-      <div id="status" class="status muted"></div>
-    </section>
-
-    <section class="card small muted">
-      <strong>Note:</strong> Documents are checked by our verification system. Wrong details = Rejection.
-    </section>
-
-    <footer class="footer">
-      <div>Contact: <a id="contactEmail" href="mailto:contact@example.com">contact@example.com</a></div>
-      <div class="footer-right">Install: browser menu → Add to Home screen</div>
-    </footer>
   </main>
 
-  <script src="app.js"></script>
+  <script>
+    document.getElementById("applyBtn").onclick = () => {
+      let cibil = Number(document.getElementById("cibil").value);
+
+      if (cibil < 350) {
+        document.getElementById("status").innerHTML =
+          "❌ Minimum CIBIL 350 required to apply.";
+        return;
+      }
+
+      document.getElementById("status").innerHTML =
+        "✔ Congratulations! You are eligible. Our team will contact you.";
+    };
+  </script>
+
 </body>
 </html>
