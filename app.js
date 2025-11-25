@@ -1,11 +1,20 @@
-// app.js - simple frontend checks and UI actions
+// basic behaviour: EMI calc, validate CIBIL >= 350, save application locally (for admin view)
 (function(){
-  const minCibil = 350;
-  document.getElementById('minCibil').innerText = minCibil;
+  const q = s => document.querySelector(s);
 
-  // Install prompt PWA
+  // EMI calc
+  q('#heroCalc').addEventListener('click', ()=>{
+    const A = Number(q('#heroAmount').value)||0;
+    const n = Number(q('#heroTenure').value)||1;
+    const r = (Number(q('#heroInterest').value)||0)/100/12;
+    if (A<=0){ q('#heroResult').innerText='Enter a valid amount'; return; }
+    const m = (A*r)/(1-Math.pow(1+r,-n)) || (A/n);
+    q('#heroResult').innerHTML = `<strong>Estimated monthly:</strong> ₹ ${m.toFixed(2)} • Total ₹ ${(m*n).toFixed(2)}`;
+  });
+
+  // install prompt
   let deferredPrompt;
-  const installBtn = document.getElementById('installBtn');
+  const installBtn = q('#installBtn');
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
@@ -19,52 +28,43 @@
     installBtn.hidden = true;
   });
 
-  // submit handler
-  const submitBtn = document.getElementById('submitBtn');
-  const status = document.getElementById('status');
+  // submit application
+  q('#applyBtn').addEventListener('click', ()=>{
+    const name = q('#name').value.trim();
+    const phone = q('#phone').value.trim();
+    const amount = Number(q('#amount').value)||0;
+    const tenure = Number(q('#tenure').value)||0;
+    const interest = Number(q('#interest').value)||0;
+    const cibil = Number(q('#cibil').value)||0;
 
-  function showStatus(msg, ok=true){
-    status.innerText = msg;
-    status.style.color = ok ? '#0f5132' : '#7a1b1b';
-    status.style.background = ok ? 'rgba(16,185,129,0.06)' : 'rgba(255,0,0,0.04)';
-    status.style.padding = '12px';
-    status.style.borderRadius = '10px';
-  }
+    if(!name || !phone || amount<=0){ q('#status').innerText='Please fill name, phone and valid amount.'; return; }
+    if(cibil < 350){ q('#status').innerText='Sorry — minimum CIBIL required is 350. Application rejected.'; return; }
 
-  submitBtn.addEventListener('click', ()=>{
-    const name = document.getElementById('name').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const amount = Number(document.getElementById('amount').value);
-    const tenure = Number(document.getElementById('tenure').value);
-    const interest = Number(document.getElementById('interest').value);
-    const cibil = Number(document.getElementById('cibil').value);
+    // collect filenames (no server upload here)
+    const aadhaar = q('#aadhaar').files.length ? q('#aadhaar').files[0].name : '';
+    const pan = q('#pan').files.length ? q('#pan').files[0].name : '';
+    const selfie = q('#selfie').files.length ? q('#selfie').files[0].name : '';
 
-    const aadhaarFile = document.getElementById('aadhaar').files[0];
-    const panFile = document.getElementById('pan').files[0];
-    const selfieFile = document.getElementById('selfie').files[0];
+    const app = {
+      id: Date.now(),
+      name, phone, amount, tenure, interest, cibil,
+      aadhaar, pan, selfie,
+      created: new Date().toISOString(),
+      status: 'pending'
+    };
 
-    if (!name) { showStatus('Enter full name', false); return; }
-    if (!phone || phone.length < 10) { showStatus('Enter valid phone', false); return; }
-    if (!amount || amount < 1000) { showStatus('Enter loan amount (min 1000)', false); return; }
-    if (!tenure || tenure <= 0) { showStatus('Enter tenure months', false); return; }
-    if (Number.isNaN(cibil) || cibil < minCibil) { showStatus('CIBIL too low — minimum required: ' + minCibil, false); return; }
+    // save locally
+    let apps = JSON.parse(localStorage.getItem('loan_apps')||'[]');
+    apps.push(app);
+    localStorage.setItem('loan_apps', JSON.stringify(apps));
 
-    // require uploads
-    if (!aadhaarFile || !panFile || !selfieFile){ showStatus('Please upload Aadhaar, PAN and Selfie', false); return; }
-
-    showStatus('Submitting application — please wait...');
-
-    // Simple simulate upload + local save
-    setTimeout(()=>{
-      // store local copy
-      const entry = { name, phone, amount, tenure, interest, cibil, time: Date.now() };
-      const list = JSON.parse(localStorage.getItem('loan_apps')||'[]');
-      list.unshift(entry);
-      localStorage.setItem('loan_apps', JSON.stringify(list));
-
-      showStatus('Application submitted successfully. Our team will review documents. (This is demo frontend only.)');
-      // clear (optional)
-      // document.getElementById('name').value = '';
-    }, 1200);
+    q('#status').innerText = 'Application submitted — thanks. Admin will review (stored locally).';
+    // clear a few fields
+    q('#name').value=''; q('#phone').value=''; q('#amount').value=''; q('#cibil').value='350';
   });
+
+  q('#clearLocal').addEventListener('click', ()=>{
+    localStorage.removeItem('loan_apps'); q('#status').innerText='Local application data cleared.';
+  });
+
 })();
