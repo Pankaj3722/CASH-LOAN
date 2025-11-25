@@ -1,7 +1,7 @@
 {
   "name": "LOAN PAY",
   "short_name": "LoanPay",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1565ff",
