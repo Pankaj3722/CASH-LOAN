@@ -1,180 +1,80 @@
-<!doctype html>
-<html lang="hi">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>LOAN PAY — Apply fast</title>
-
-  <link rel="manifest" href="manifest.json" />
-  <!-- icon with fallback: single .png first, then .png.png if needed -->
-  <link rel="icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png" />
-  <link rel="apple-touch-icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png" />
-  <link rel="stylesheet" href="styles.css" />
-  <meta name="theme-color" content="#0b84ff" />
-</head>
-<body class="page">
-
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <!-- img src + onerror fallback to double extension if that's how it was uploaded -->
-        <img id="brandIcon" src="icons/file_0000000043a872078e5b55921c7e8ad.png" 
-             onerror="this.onerror=null; this.src='icons/file_0000000043a872078e5b55921c7e8ad.png.png';"
-             alt="Loan Pay" class="brand-icon"/>
-        <div class="brand-text">
-          <h1 class="brand-title">LOAN PAY</h1>
-          <div class="brand-sub">Fast • Simple • Secure</div>
-        </div>
+<!-- ===== new header + mobile login (replace your existing header & signup section) ===== -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <img src="icons/file_0000000043a872078e5b55921c7e8ad.png" alt="Loan Pay" class="brand-icon"/>
+      <div>
+        <h1 class="brand-title">LOAN PAY</h1>
+        <div class="brand-sub">Fast • Simple • Secure</div>
       </div>
-
-      <nav class="top-actions">
-        <button id="installBtn" class="btn ghost" hidden>Install</button>
-      </nav>
     </div>
-  </header>
 
-  <main class="container">
-    <section class="hero card">
-      <div class="hero-left">
-        <h2>Apply for loan in 60 seconds</h2>
-        <p class="muted">Small loans, simple process. Instant EMI estimate — email optional.</p>
+    <!-- mobile quick login button (shows login panel) -->
+    <nav class="top-actions">
+      <button id="openLogin" class="btn ghost">Login / OTP</button>
+    </nav>
+  </div>
+</header>
 
-        <div class="hero-fields">
-          <label>Loan amount (₹)</label>
-          <input id="heroAmount" type="number" placeholder="10000" value="10000" />
-          <div class="grid-2">
-            <div>
-              <label>Tenure (months)</label>
-              <input id="heroTenure" type="number" placeholder="12" value="12" />
-            </div>
-            <div>
-              <label>Interest % (annual)</label>
-              <input id="heroInterest" type="number" placeholder="12" value="12" />
-            </div>
-          </div>
+<!-- quick login / OTP panel (initially visible under header) -->
+<section id="mobileLogin" class="card compact">
+  <h3>Login with Mobile (OTP)</h3>
+  <div class="row">
+    <input id="mobileInput" placeholder="Enter mobile number (eg. 91XXXXXXXXXX)" maxlength="12"/>
+    <button id="sendOtpBtn" class="btn primary">Send OTP</button>
+  </div>
+  <div id="otpArea" class="row" style="display:none;margin-top:10px;">
+    <input id="otpInput" placeholder="Enter OTP" maxlength="6" />
+    <button id="verifyOtpBtn" class="btn">Verify</button>
+  </div>
+  <div id="loginMsg" class="muted small" style="margin-top:8px;"></div>
+</section>
 
-          <div class="hero-actions">
-            <button id="heroCalc" class="btn primary">Estimate EMI</button>
-            <div id="heroResult" class="result small muted">Monthly estimate will show here</div>
-          </div>
-        </div>
-      </div>
+<!-- Hero / quick estimate stays as before -->
+<section class="hero card">
+  <h2>Apply for loan in 60 seconds</h2>
+  <p class="muted">Small loans, simple process. EMI estimate shown instantly — no signup required (email optional).</p>
+  <div class="hero-grid">
+    <div>
+      <label class="label">Loan amount (₹)</label>
+      <input id="heroAmount" type="number" placeholder="10000" value="10000" />
+    </div>
+    <div>
+      <label class="label">Tenure (months)</label>
+      <input id="heroTenure" type="number" placeholder="12" value="12" />
+    </div>
+    <div>
+      <label class="label">Interest % (annual)</label>
+      <input id="heroInterest" type="number" placeholder="12" value="12" />
+    </div>
+    <div class="hero-actions">
+      <button id="heroCalc" class="btn primary">Estimate EMI</button>
+    </div>
+  </div>
+  <div id="heroResult" class="result"></div>
+</section>
 
-      <div class="hero-right">
-        <div class="highlight">
-          <div class="badge">LOW FEE</div>
-          <div class="big">Easy approval</div>
-          <p class="muted">Minimum eligible credit: <strong>₹350</strong></p>
-        </div>
-      </div>
-    </section>
+<!-- Apply section: hidden by default, दिखेगा OTP verify होने पर -->
+<section id="applySection" class="card hidden">
+  <h3>Apply for Loan</h3>
+  <div class="form-grid">
+    <div><label class="label">Full name</label><input id="name" placeholder="Your name" /></div>
+    <div><label class="label">Phone</label><input id="phone" placeholder="91XXXXXXXXXX" /></div>
+    <div><label class="label">Amount (₹)</label><input id="amount" type="number" placeholder="10000" /></div>
+    <div><label class="label">Tenure (months)</label><input id="tenure" type="number" placeholder="6" /></div>
+    <div><label class="label">Interest % (annual)</label><input id="interest" type="number" placeholder="12" /></div>
+    <div><label class="label">CIBIL Score</label><input id="cibil" placeholder="350" /></div>
+  </div>
 
-    <section id="signupSection" class="card compact">
-      <h3>Signup (email optional)</h3>
-      <div class="row">
-        <input id="emailInput" placeholder="Email (example@gmail.com)" />
-        <button id="signupBtn" class="btn">Continue</button>
-      </div>
-      <div class="muted small">Email used only to contact you about application.</div>
-    </section>
+  <div class="apply-actions">
+    <button id="applyBtn" class="btn primary">Submit Application</button>
+    <button id="clearLocal" class="btn ghost">Clear Local Data</button>
+  </div>
 
-    <section id="applySection" class="card hidden">
-      <h3>Apply for Loan</h3>
-      <div class="form-grid">
-        <div><label>Full name</label><input id="name" placeholder="Your name" /></div>
-        <div><label>Phone</label><input id="phone" placeholder="91XXXXXXXXXX" /></div>
-        <div><label>Amount (₹)</label><input id="amount" type="number" placeholder="10000" /></div>
-        <div><label>Tenure (months)</label><input id="tenure" type="number" placeholder="6" /></div>
-        <div><label>Interest % (annual)</label><input id="interest" type="number" placeholder="12" /></div>
-        <div><label>Purpose</label><input id="purpose" placeholder="Purpose of loan" /></div>
-      </div>
+  <div id="status" class="status muted"></div>
+</section>
 
-      <div class="apply-actions">
-        <button id="applyBtn" class="btn primary">Submit Application</button>
-        <button id="clearLocal" class="btn ghost">Clear Local Data</button>
-      </div>
-
-      <div id="status" class="status muted"></div>
-    </section>
-
-    <section class="card small muted">
-      <strong>Privacy:</strong> We store only name, email, phone and loan details locally. Admin can export data.
-    </section>
-
-    <footer class="footer">
-      <div>Contact: <a id="contactEmail" href="mailto:contact@example.com">contact@example.com</a></div>
-      <div class="footer-right">Install: browser menu → Add to Home screen</div>
-    </footer>
-  </main>
-
-  <script src="app.js"></script>
-  <script>
-    // small UI helpers (install button and EMI calc)
-    (function(){
-      let deferredPrompt;
-      const installBtn = document.getElementById('installBtn');
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        installBtn.hidden = false;
-      });
-      installBtn.addEventListener('click', async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        installBtn.hidden = true;
-      });
-
-      const q = s => document.querySelector(s);
-      document.getElementById('heroCalc').onclick = ()=>{
-        const A = Number(q('#heroAmount').value)||0;
-        const n = Number(q('#heroTenure').value)||1;
-        const r = (Number(q('#heroInterest').value)||0)/100/12;
-        if (A<=0){ q('#heroResult').innerText='Enter a valid amount'; return; }
-        const m = (A*r)/(1-Math.pow(1+r,-n));
-        q('#heroResult').innerHTML = `₹ ${m.toFixed(2)} / month • Total ₹ ${(m*n).toFixed(2)}`;
-      };
-
-      // show apply section if email present
-      const signupBtn = document.getElementById('signupBtn');
-      signupBtn.onclick = ()=>{
-        const email = document.getElementById('emailInput').value.trim();
-        if (email && !email.includes('@')) { alert('Valid email required'); return; }
-        localStorage.setItem('loanpay_user_email', email || '');
-        document.getElementById('signupSection').classList.add('hidden');
-        document.getElementById('applySection').classList.remove('hidden');
-      };
-
-      // apply button: minimal validation (amount >=350)
-      document.getElementById('applyBtn').onclick = ()=>{
-        const amount = Number(document.getElementById('amount').value || 0);
-        if (amount < 350) { alert('Minimum application amount ₹350'); return; }
-        // reuse existing app.js storage logic if present
-        const app = {
-          email: localStorage.getItem('loanpay_user_email')||'',
-          name: document.getElementById('name').value.trim(),
-          phone: document.getElementById('phone').value.trim(),
-          amount, tenure: Number(document.getElementById('tenure').value||0),
-          interest: Number(document.getElementById('interest').value||0),
-          purpose: document.getElementById('purpose').value.trim(),
-          date: new Date().toISOString()
-        };
-        if (!app.name || !app.amount) { alert('Name and amount required'); return; }
-        let apps = JSON.parse(localStorage.getItem('loanpay_apps')||'[]');
-        apps.push(app);
-        localStorage.setItem('loanpay_apps', JSON.stringify(apps));
-        document.getElementById('status').innerHTML = '<strong>Application submitted.</strong> Admin will contact you.';
-        // optionally clear fields
-      };
-
-      // show apply if already signed up
-      if (localStorage.getItem('loanpay_user_email')) {
-        document.getElementById('signupSection').classList.add('hidden');
-        document.getElementById('applySection').classList.remove('hidden');
-      }
-    })();
-  </script>
-
-</body>
-</html>
+<!-- small note -->
+<section class="card small muted">
+  <strong>Note:</strong> Minimum CIBIL required: <strong>350</strong>. Applications with CIBIL &lt; 350 will be rejected automatically.
+</section>
