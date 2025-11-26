@@ -6,21 +6,24 @@
   <title>LOAN PAY — Apply fast</title>
 
   <link rel="manifest" href="manifest.json" />
-  <!-- Replace ICON_FILENAME_HERE with your exact uploaded icon filename -->
-  <link rel="icon" type="image/png" href="icons/ICON_FILENAME_HERE" />
-  <link rel="apple-touch-icon" href="icons/ICON_FILENAME_HERE" />
+  <!-- icon with fallback: single .png first, then .png.png if needed -->
+  <link rel="icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png" />
+  <link rel="apple-touch-icon" href="icons/file_0000000043a872078e5b55921c7e8ad.png" />
   <link rel="stylesheet" href="styles.css" />
-  <meta name="theme-color" content="#0b5eff" />
+  <meta name="theme-color" content="#0b84ff" />
 </head>
 <body class="page">
 
   <header class="topbar">
-    <div class="topbar-inner container">
+    <div class="topbar-inner">
       <div class="brand">
-        <img src="icons/ICON_FILENAME_HERE" alt="Loan Pay" class="brand-icon"/>
-        <div>
+        <!-- img src + onerror fallback to double extension if that's how it was uploaded -->
+        <img id="brandIcon" src="icons/file_0000000043a872078e5b55921c7e8ad.png" 
+             onerror="this.onerror=null; this.src='icons/file_0000000043a872078e5b55921c7e8ad.png.png';"
+             alt="Loan Pay" class="brand-icon"/>
+        <div class="brand-text">
           <h1 class="brand-title">LOAN PAY</h1>
-          <div class="brand-sub">Fast • Simple • Safe</div>
+          <div class="brand-sub">Fast • Simple • Secure</div>
         </div>
       </div>
 
@@ -31,48 +34,51 @@
   </header>
 
   <main class="container">
-    <section class="hero card elevated">
+    <section class="hero card">
       <div class="hero-left">
         <h2>Apply for loan in 60 seconds</h2>
-        <p class="muted">Small loans, simple process. EMI estimate shown instantly — email optional.</p>
+        <p class="muted">Small loans, simple process. Instant EMI estimate — email optional.</p>
 
-        <div class="hero-grid">
-          <div class="inputblock">
-            <label>Loan amount (₹)</label>
-            <input id="heroAmount" type="number" placeholder="10000" value="10000" />
+        <div class="hero-fields">
+          <label>Loan amount (₹)</label>
+          <input id="heroAmount" type="number" placeholder="10000" value="10000" />
+          <div class="grid-2">
+            <div>
+              <label>Tenure (months)</label>
+              <input id="heroTenure" type="number" placeholder="12" value="12" />
+            </div>
+            <div>
+              <label>Interest % (annual)</label>
+              <input id="heroInterest" type="number" placeholder="12" value="12" />
+            </div>
           </div>
-          <div class="inputblock">
-            <label>Tenure (months)</label>
-            <input id="heroTenure" type="number" placeholder="12" value="12" />
-          </div>
-          <div class="inputblock">
-            <label>Interest % (annual)</label>
-            <input id="heroInterest" type="number" placeholder="12" value="12" />
-          </div>
+
           <div class="hero-actions">
-            <button id="heroCalc" class="btn primary large">Estimate EMI</button>
+            <button id="heroCalc" class="btn primary">Estimate EMI</button>
+            <div id="heroResult" class="result small muted">Monthly estimate will show here</div>
           </div>
         </div>
-
-        <div id="heroResult" class="result"></div>
       </div>
 
       <div class="hero-right">
-        <div class="pill">Instant decision • No hidden fees</div>
-        <div class="big-figure">₹ <span id="exampleAmt">10,000</span></div>
+        <div class="highlight">
+          <div class="badge">LOW FEE</div>
+          <div class="big">Easy approval</div>
+          <p class="muted">Minimum eligible credit: <strong>₹350</strong></p>
+        </div>
       </div>
     </section>
 
-    <section id="signupSection" class="card compact elevated">
+    <section id="signupSection" class="card compact">
       <h3>Signup (email optional)</h3>
       <div class="row">
         <input id="emailInput" placeholder="Email (example@gmail.com)" />
         <button id="signupBtn" class="btn">Continue</button>
       </div>
-      <div class="muted small">Only used to contact you about applications.</div>
+      <div class="muted small">Email used only to contact you about application.</div>
     </section>
 
-    <section id="applySection" class="card elevated hidden">
+    <section id="applySection" class="card hidden">
       <h3>Apply for Loan</h3>
       <div class="form-grid">
         <div><label>Full name</label><input id="name" placeholder="Your name" /></div>
@@ -103,19 +109,72 @@
 
   <script src="app.js"></script>
   <script>
+    // small UI helpers (install button and EMI calc)
     (function(){
-      // small UI helpers
-      const q=(s)=>document.querySelector(s);
+      let deferredPrompt;
+      const installBtn = document.getElementById('installBtn');
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.hidden = false;
+      });
+      installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        installBtn.hidden = true;
+      });
+
+      const q = s => document.querySelector(s);
       document.getElementById('heroCalc').onclick = ()=>{
         const A = Number(q('#heroAmount').value)||0;
         const n = Number(q('#heroTenure').value)||1;
         const r = (Number(q('#heroInterest').value)||0)/100/12;
         if (A<=0){ q('#heroResult').innerText='Enter a valid amount'; return; }
         const m = (A*r)/(1-Math.pow(1+r,-n));
-        q('#heroResult').innerHTML = `<strong>Estimated monthly:</strong> ₹ ${m.toFixed(2)} • Total ₹ ${(m*n).toFixed(2)}`;
-        q('#exampleAmt').innerText = A.toLocaleString('en-IN');
+        q('#heroResult').innerHTML = `₹ ${m.toFixed(2)} / month • Total ₹ ${(m*n).toFixed(2)}`;
       };
+
+      // show apply section if email present
+      const signupBtn = document.getElementById('signupBtn');
+      signupBtn.onclick = ()=>{
+        const email = document.getElementById('emailInput').value.trim();
+        if (email && !email.includes('@')) { alert('Valid email required'); return; }
+        localStorage.setItem('loanpay_user_email', email || '');
+        document.getElementById('signupSection').classList.add('hidden');
+        document.getElementById('applySection').classList.remove('hidden');
+      };
+
+      // apply button: minimal validation (amount >=350)
+      document.getElementById('applyBtn').onclick = ()=>{
+        const amount = Number(document.getElementById('amount').value || 0);
+        if (amount < 350) { alert('Minimum application amount ₹350'); return; }
+        // reuse existing app.js storage logic if present
+        const app = {
+          email: localStorage.getItem('loanpay_user_email')||'',
+          name: document.getElementById('name').value.trim(),
+          phone: document.getElementById('phone').value.trim(),
+          amount, tenure: Number(document.getElementById('tenure').value||0),
+          interest: Number(document.getElementById('interest').value||0),
+          purpose: document.getElementById('purpose').value.trim(),
+          date: new Date().toISOString()
+        };
+        if (!app.name || !app.amount) { alert('Name and amount required'); return; }
+        let apps = JSON.parse(localStorage.getItem('loanpay_apps')||'[]');
+        apps.push(app);
+        localStorage.setItem('loanpay_apps', JSON.stringify(apps));
+        document.getElementById('status').innerHTML = '<strong>Application submitted.</strong> Admin will contact you.';
+        // optionally clear fields
+      };
+
+      // show apply if already signed up
+      if (localStorage.getItem('loanpay_user_email')) {
+        document.getElementById('signupSection').classList.add('hidden');
+        document.getElementById('applySection').classList.remove('hidden');
+      }
     })();
   </script>
+
 </body>
 </html>
